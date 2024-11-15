@@ -8,7 +8,7 @@ import os
 
 def send_email(to_email, cc_email, subject, body, attachment_path):
     from_email = "harshwardhan22csu392@ncuindia.edu"  # Replace with your email
-    from_password = "Understood@523"  # Replace with your email password
+    from_password = "umrp qgqg rdyh qscq"  # Replace with your app-specific password
 
     # Create the email message
     msg = MIMEMultipart()
@@ -40,6 +40,13 @@ def send_email(to_email, cc_email, subject, body, attachment_path):
 
     print(f"Email sent to {to_email}")
 
+def find_certificate(base_output_dir, participant):
+    for root, dirs, files in os.walk(base_output_dir):
+        for file in files:
+            if file == f"{participant}.pdf":
+                return os.path.join(root, file)
+    return None
+
 def read_excel_and_send_certificates(file_path, base_output_dir):
     df = pd.read_excel(file_path)
     print(f"Columns in {file_path}: {df.columns.tolist()}")  # Print column names
@@ -48,7 +55,6 @@ def read_excel_and_send_certificates(file_path, base_output_dir):
     roll_no_column = input("Enter the column name for the participant's roll number: ")
     email_column = input("Enter the column name for the participant's email: ")
     cc_email = input("Enter the CC email address (or leave blank if none): ")
-    number = input(f"Enter the number (CS Hours) for {file_path}: ")
 
     participants = df.apply(lambda row: f"{row[name_column]} {row[roll_no_column]}", axis=1).tolist()
     emails = df[email_column].tolist()
@@ -64,19 +70,19 @@ def read_excel_and_send_certificates(file_path, base_output_dir):
         "The NCU-ASQ Team\n"
     )
 
-    for participant, email in zip(participants, emails):
+    for index, email in enumerate(emails):
+        participant_name = df.iloc[index][name_column]
         # Replace placeholder with actual participant name
-        personalized_thank_you_note = thank_you_note.replace("[Participant's Name]", participant)
+        personalized_thank_you_note = thank_you_note.replace("[Participant's Name]", participant_name)
         
-        certificate_path = os.path.join(base_output_dir, f"{participant}.pdf")
-        if os.path.exists(certificate_path):
+        certificate_path = find_certificate(base_output_dir, participants[index])
+        if certificate_path:
             send_email(email, cc_email, "Your Certificate", personalized_thank_you_note, certificate_path)
         else:
-            print(f"Certificate for {participant} not found.")
+            print(f"Certificate for {participants[index]} not found.")
 
 # Example usage
-excel_files = [r"Quality Management Workshop\ASQ Member List - Quality Management Workshop.xlsx",
-               "Quality Management Workshop\Participant List - Quality Management Workshop.xlsx"]
+excel_files = [r"Quality Management Workshop\Test.xlsx"]
 
 base_output_dir = r"Quality Management Workshop\Processed Certificates"
 
