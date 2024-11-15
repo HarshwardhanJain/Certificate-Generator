@@ -55,6 +55,7 @@ def read_excel_and_send_certificates(file_path, base_output_dir):
     roll_no_column = input("Enter the column name for the participant's roll number: ")
     email_column = input("Enter the column name for the participant's email: ")
     cc_email = input("Enter the CC email address (or leave blank if none): ")
+    subject = input("Enter the subject line for the email: ")
 
     participants = df.apply(lambda row: f"{row[name_column]} {row[roll_no_column]}", axis=1).tolist()
     emails = df[email_column].tolist()
@@ -77,7 +78,7 @@ def read_excel_and_send_certificates(file_path, base_output_dir):
         
         certificate_path = find_certificate(base_output_dir, participants[index])
         if certificate_path:
-            send_email(email, cc_email, "Your Certificate", personalized_thank_you_note, certificate_path)
+            send_email(email, cc_email, subject, personalized_thank_you_note, certificate_path)
         else:
             print(f"Certificate for {participants[index]} not found.")
 
