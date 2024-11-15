@@ -62,12 +62,12 @@ def read_excel_and_send_certificates(file_path, base_output_dir):
     # Thank you note
     thank_you_note = (
         "Dear [Participant's Name],\n\n"
-        "We would like to extend our heartfelt gratitude for your participation in the Quality Management Workshop organized by the NCU-ASQ Student Chapter. "
+        "We would like to extend our heartfelt gratitude for your participation in the Quality Management Workshop organized by the ASQ Student Chapter. "
         "Your engagement and enthusiasm contributed significantly to the success of the event.\n\n"
         "We hope that the insights shared during the workshop, particularly on Lean Manufacturing and Quality Management Systems, will empower you to enhance quality and efficiency in your respective fields.\n\n"
         "Thank you once again for being a part of this enriching experience. We look forward to seeing you at future events!\n\n"
         "Warm regards,\n"
-        "The NCU-ASQ Team\n"
+        "ASQ Student Chapter Team\n"
     )
 
     for index, email in enumerate(emails):
