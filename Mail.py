@@ -82,7 +82,7 @@ def read_excel_and_send_certificates(file_path, base_output_dir):
             print(f"Certificate for {participants[index]} not found.")
 
 # Example usage
-excel_files = [r"Quality Management Workshop\Test.xlsx"]
+excel_files = [r"Quality Management Workshop\Test - Mail.xlsx"]
 
 base_output_dir = r"Quality Management Workshop\Processed Certificates"
 
