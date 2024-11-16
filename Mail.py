@@ -5,6 +5,7 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 def send_email(to_email, cc_email, subject, body, attachment_path):
     from_email = "harshwardhan22csu392@ncuindia.edu"  # Replace with your email
@@ -33,12 +34,14 @@ def send_email(to_email, cc_email, subject, body, attachment_path):
             msg.attach(part)
 
     # Create the SMTP session
-    with smtplib.SMTP('smtp.gmail.com', 587) as server:
-        server.starttls()  # Enable security
-        server.login(from_email, from_password)  # Log in to your email account
-        server.send_message(msg)  # Send the email
-
-    print(f"Email sent to {to_email}")
+    try:
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()  # Enable security
+            server.login(from_email, from_password)  # Log in to your email account
+            server.send_message(msg)  # Send the email
+        print(f"Email sent to {to_email}")
+    except Exception as e:
+        print(f"Failed to send email to {to_email}: {e}")
 
 def find_certificate(base_output_dir, participant):
     for root, dirs, files in os.walk(base_output_dir):
@@ -60,7 +63,7 @@ def read_excel_and_send_certificates(file_path, base_output_dir):
     participants = df.apply(lambda row: f"{row[name_column]} {row[roll_no_column]}", axis=1).tolist()
     emails = df[email_column].tolist()
 
-    # Thank you note
+    # Thank you note (original)
     thank_you_note = (
         "Dear [Participant's Name],\n\n"
         "We would like to extend our heartfelt gratitude for your participation in the Quality Management Workshop organized by the ASQ Student Chapter. "
@@ -71,21 +74,44 @@ def read_excel_and_send_certificates(file_path, base_output_dir):
         "ASQ Student Chapter Team\n"
     )
 
-    for index, email in enumerate(emails):
-        participant_name = df.iloc[index][name_column]
-        # Replace placeholder with actual participant name
-        personalized_thank_you_note = thank_you_note.replace("[Participant's Name]", participant_name)
-        
-        certificate_path = find_certificate(base_output_dir, participants[index])
-        if certificate_path:
-            send_email(email, cc_email, subject, personalized_thank_you_note, certificate_path)
-        else:
-            print(f"Certificate for {participants[index]} not found.")
+    # Use ThreadPoolExecutor to send emails concurrently
+    with ThreadPoolExecutor(max_workers=5) as executor:  # Adjust max_workers as needed
+        for index, email in enumerate(emails):
+            participant_name = df.iloc[index][name_column]
+            # Replace placeholder with actual participant name
+            personalized_thank_you_note = thank_you_note.replace("[Participant's Name]", participant_name)
+            
+            certificate_path = find_certificate(base_output_dir, participants[index])
+            if certificate_path:
+                # Each email is sent to its own recipient
+                executor.submit(send_email, email, cc_email, subject, personalized_thank_you_note, certificate_path)
+            else:
+                print(f"Certificate for {participants[index ]} not found.")
 
 # Example usage
-excel_files = [r"Quality Management Workshop\Test - Mail.xlsx"]
+excel_files = [
+    r"Quality Management Workshop\ASQ Member List - Quality Management Workshop.xlsx",
+    r"Quality Management Workshop\Coordinator List - Quality Management Workshop.xlsx",
+    r"Quality Management Workshop\Participant List - Quality Management Workshop.xlsx"
+]
+
+# Prompt user to select which Excel sheet to start from
+print("Available Excel files:")
+for i, file in enumerate(excel_files):
+    print(f"{i + 1}: {file}")
+
+while True:
+    try:
+        start_index = int(input("Enter the number of the Excel sheet you would like to start from: ")) - 1
+        if 0 <= start_index < len(excel_files):
+            break
+        else:
+            print("Please enter a valid number corresponding to the available Excel files.")
+    except ValueError:
+        print("Invalid input. Please enter a number.")
 
 base_output_dir = r"Quality Management Workshop\Processed Certificates"
 
-for file in excel_files:
+# Process selected Excel sheet and any subsequent sheets
+for file in excel_files[start_index:]:
     read_excel_and_send_certificates(file, base_output_dir)
