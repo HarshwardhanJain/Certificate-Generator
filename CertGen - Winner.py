@@ -49,7 +49,7 @@ def create_certificates(participants, number, output_dir):
         new_pdf = PdfReader(packet)
         
         # Ensure the template path is correct
-        template_path = "Quality Week Celebration\Winners - World Quality Week Celebration.pdf"
+        template_path = "Quality Week Celebration\Winner_World quality week (quiz competition).pdf"
         existing_pdf = PdfReader(open(template_path, "rb"))
         
         # Create a writer object
@@ -76,14 +76,9 @@ def read_excel_and_generate_certificates(file_path, base_output_dir):
     df = pd.read_excel(file_path)
     print(f"Columns in {file_path}: {df.columns.tolist()}")  # Print column names
     
-    while True:
-        folder_name = input(f"Enter the folder name to create inside the defined path for {file_path}: ")
-        output_dir = os.path.join(base_output_dir, folder_name)
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-            break
-        else:
-            print("Folder already exists. Please try again.")
+    folder_name = input(f"Enter the folder name to create inside the defined path for {file_path}: ")
+    output_dir = os.path.join(base_output_dir, folder_name)
+    os.makedirs(output_dir, exist_ok=True)
     
     name_column = input("Enter the column name for the participant's name: ")
     roll_no_column = input("Enter the column name for the participant's roll number: ")
@@ -93,7 +88,7 @@ def read_excel_and_generate_certificates(file_path, base_output_dir):
     create_certificates(participants, number, output_dir)
 
 # Example usage
-excel_files = [r"Quality Week Celebration\Test.xlsx"]
+excel_files = [r"Quality Week Celebration\Test - Winners.xlsx"]
 
 base_output_dir = r"Quality Week Celebration\Processed Certificates"
 

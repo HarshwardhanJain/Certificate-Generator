@@ -76,14 +76,9 @@ def read_excel_and_generate_certificates(file_path, base_output_dir):
     df = pd.read_excel(file_path)
     print(f"Columns in {file_path}: {df.columns.tolist()}")  # Print column names
     
-    while True:
-        folder_name = input(f"Enter the folder name to create inside the defined path for {file_path}: ")
-        output_dir = os.path.join(base_output_dir, folder_name)
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-            break
-        else:
-            print("Folder already exists. Please try again.")
+    folder_name = input(f"Enter the folder name to create inside the defined path for {file_path}: ")
+    output_dir = os.path.join(base_output_dir, folder_name)
+    os.makedirs(output_dir, exist_ok=True)
     
     name_column = input("Enter the column name for the participant's name: ")
     roll_no_column = input("Enter the column name for the participant's roll number: ")
