@@ -90,8 +90,7 @@ def read_excel_and_send_certificates(file_path, base_output_dir):
                 print(f"Certificates for {participants[index]} not found.")
 
 # Example usage
-excel_files = [r"Quality Week Celebration\ASQ_ Movie Coordinator List - World Quality Week Celebration.xlsx",
-               r"Quality Week Celebration\ASQ_ Movie Participant List - World Quality Week Celebration.xlsx"]
+excel_files = [r"Quality Week Celebration\ASQ_ Movie Participant List - World Quality Week Celebration.xlsx"]
 
 # Prompt user to select which Excel sheet to start from
 print("Available Excel files:")
