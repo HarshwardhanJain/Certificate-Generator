@@ -34,8 +34,8 @@ def create_certificates(participants, number, output_dir):
         can.setFont(font, font_size_number)
         
         # Set coordinates for the participant's number
-        x_number = 530  # X-coordinate for the number
-        y_number = 190  # Y-coordinate for the number
+        x_number = 593  # X-coordinate for the number
+        y_number = 185  # Y-coordinate for the number
         
         # Draw the participant's number at the specified coordinates
         can.drawString(x_number, y_number, number)

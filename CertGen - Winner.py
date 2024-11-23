@@ -34,8 +34,8 @@ def create_certificates(participants, number, output_dir):
         can.setFont(font, font_size_number)
         
         # Set coordinates for the participant's number
-        x_number = 530  # X-coordinate for the number
-        y_number = 190  # Y-coordinate for the number
+        x_number = 593  # X-coordinate for the number
+        y_number = 185  # Y-coordinate for the number
         
         # Draw the participant's number at the specified coordinates
         can.drawString(x_number, y_number, number)
@@ -49,7 +49,7 @@ def create_certificates(participants, number, output_dir):
         new_pdf = PdfReader(packet)
         
         # Ensure the template path is correct
-        template_path = "Quality Management Workshop/(Participant) Certificate Template - Quality Management Workshop.pdf"
+        template_path = "Quality Week Celebration\Winners - World Quality Week Celebration.pdf"
         existing_pdf = PdfReader(open(template_path, "rb"))
         
         # Create a writer object
@@ -87,16 +87,15 @@ def read_excel_and_generate_certificates(file_path, base_output_dir):
     
     name_column = input("Enter the column name for the participant's name: ")
     roll_no_column = input("Enter the column name for the participant's roll number: ")
-    number = input(f"Enter the number (CS Hours) for {file_path}: ")
+    number = input(f"Enter the number for {file_path}: ")
     
     participants = df.apply(lambda row: f"{row[name_column]} {row[roll_no_column]}", axis=1).tolist()
     create_certificates(participants, number, output_dir)
 
 # Example usage
-excel_files = [r"Quality Management Workshop\ASQ Member List - Quality Management Workshop.xlsx",
-               "Quality Management Workshop\Participant List - Quality Management Workshop.xlsx"]
+excel_files = [r"Quality Week Celebration\Test.xlsx"]
 
-base_output_dir = r"Quality Management Workshop\Processed Certificates"
+base_output_dir = r"Quality Week Celebration\Processed Certificates"
 
 for file in excel_files:
     read_excel_and_generate_certificates(file, base_output_dir)
