@@ -7,7 +7,7 @@ from email import encoders
 import os
 from concurrent.futures import ThreadPoolExecutor
 
-def send_email(to_email, bcc_email, subject, body, attachment_paths):
+def send_email(to_email, bcc_email, subject, body, attachment_path):
     from_email = "harshwardhan22csu392@ncuindia.edu"  # Replace with your email
     from_password = "dhqz hgpc taqo ijps"  # Replace with your app-specific password
 
@@ -23,14 +23,13 @@ def send_email(to_email, bcc_email, subject, body, attachment_paths):
     # Attach the body with the msg instance
     msg.attach(MIMEText(body, 'plain'))
 
-    # Attach the certificates
-    for attachment_path in attachment_paths:
-        with open(attachment_path, "rb") as attachment:
-            part = MIMEBase("application", "octet-stream")
-            part.set_payload(attachment.read())
-            encoders.encode_base64(part)
-            part.add_header("Content-Disposition", f"attachment; filename= {os.path.basename(attachment_path)}")
-            msg.attach(part)
+    # Attach the certificate
+    with open(attachment_path, "rb") as attachment:
+        part = MIMEBase("application", "octet-stream")
+        part.set_payload(attachment.read())
+        encoders.encode_base64(part)
+        part.add_header("Content-Disposition", f"attachment; filename= {os.path.basename(attachment_path)}")
+        msg.attach(part)
 
     # Create the SMTP session
     try:
@@ -42,15 +41,16 @@ def send_email(to_email, bcc_email, subject, body, attachment_paths):
     except Exception as e:
         print(f"Failed to send email to {to_email}: {e}")
 
-def find_certificates(base_output_dir, participant):
+def find_certificates(base_output_dirs, participant):
     certificates = []
-    for root, dirs, files in os.walk(base_output_dir):
-        for file in files:
-            if participant in file and file.endswith(".pdf"):
-                certificates.append(os.path.join(root, file))
+    for base_output_dir in base_output_dirs:
+        for root, dirs, files in os.walk(base_output_dir):
+            for file in files:
+                if participant in file and file.endswith(".pdf"):
+                    certificates.append(os.path.join(root, file))
     return certificates
 
-def read_excel_and_send_certificates(file_path, base_output_dir):
+def read_excel_and_send_certificates(file_path, base_output_dirs):
     df = pd.read_excel(file_path)
     print(f"Columns in {file_path}: {df.columns.tolist()}")  # Print column names
 
@@ -81,16 +81,16 @@ def read_excel_and_send_certificates(file_path, base_output_dir):
             # Replace placeholder with actual participant name
             personalized_thank_you_note = thank_you_note.replace("[Participant's Name]", participant_name)
             
-            certificate_paths = find_certificates(base_output_dir, participants[index])
+            certificate_paths = find_certificates(base_output_dirs, participants[index])
             if certificate_paths:
-                # Each email is sent to its own recipient
-                executor.submit(send_email, email, bcc_email, subject, personalized_thank_you_note, certificate_paths)
+                # Send an email for each certificate separately
+                for certificate_path in certificate_paths:
+                    executor.submit(send_email, email, bcc_email, subject, personalized_thank_you_note, certificate_path)
             else:
                 print(f"Certificates for {participants[index]} not found.")
 
 # Example usage
-excel_files = [r"Quality Week Celebration\ASQ_ Poster Coordinator List - World Quality Week Celebration.xlsx",
-               r"Quality Week Celebration\ASQ_ Poster Participant List - World Quality Week Celebration.xlsx"]
+excel_files = [r"Quality Week Celebration\ASQ_ Movie Participant List - World Quality Week Celebration.xlsx"]
 
 # Prompt user to select which Excel sheet to start from
 print("Available Excel files:")
@@ -107,8 +107,23 @@ while True:
     except ValueError:
         print("Invalid input. Please enter a number.")
 
-base_output_dir = r"Quality Week Celebration\Processed Certificates"
+# List available folders inside the base folder
+base_folder = r"Quality Week Celebration\Processed Certificates"
+available_folders = [os.path.join(base_folder, folder) for folder in os.listdir(base_folder) if os.path.isdir(os.path.join(base_folder, folder))]
+print("Available folders:")
+for i, folder in enumerate(available_folders):
+    print(f"{i + 1}: {folder}")
+
+# Prompt user to select folders
+selected_folders = []
+while True:
+    try:
+        folder_indices = input("Enter the numbers of the folders you would like to search for certificates, separated by commas: ").split(',')
+        selected_folders = [available_folders[int(index) - 1] for index in folder_indices]
+        break
+    except (ValueError, IndexError):
+        print("Invalid input. Please enter valid numbers corresponding to the available folders.")
 
 # Process selected Excel sheet and any subsequent sheets
 for file in excel_files[start_index:]:
-    read_excel_and_send_certificates(file, base_output_dir)
+    read_excel_and_send_certificates(file, selected_folders)
