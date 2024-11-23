@@ -18,7 +18,7 @@ def send_email(to_email, bcc_email, subject, body, attachment_path):
     msg['Subject'] = subject
 
     if bcc_email:
-        to_email = [to_email] + [bcc_email]  # Include BCC in the recipient list
+        msg['Bcc'] = bcc_email  # Include BCC in the Bcc header
 
     # Attach the body with the msg instance
     msg.attach(MIMEText(body, 'plain'))
@@ -90,7 +90,8 @@ def read_excel_and_send_certificates(file_path, base_output_dirs):
                 print(f"Certificates for {participants[index]} not found.")
 
 # Example usage
-excel_files = [r"Quality Week Celebration\ASQ_ Movie Participant List - World Quality Week Celebration.xlsx"]
+excel_files = [r"Quality Week Celebration\ASQ_ Poster Participant List - World Quality Week Celebration.xlsx",
+               r"Quality Week Celebration\ASQ_ Poster Coordinator List - World Quality Week Celebration.xlsx"]
 
 # Prompt user to select which Excel sheet to start from
 print("Available Excel files:")

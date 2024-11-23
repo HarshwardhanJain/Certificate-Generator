@@ -18,7 +18,7 @@ def send_email(to_email, bcc_email, subject, body, attachment_path):
     msg['Subject'] = subject
 
     if bcc_email:
-        to_email = [to_email] + [bcc_email]  # Include BCC in the recipient list
+        msg['Bcc'] = bcc_email  # Include BCC in the Bcc header
 
     # Attach the body with the msg instance
     msg.attach(MIMEText(body, 'plain'))
