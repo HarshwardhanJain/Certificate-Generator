@@ -49,7 +49,7 @@ def create_certificates(participants, number, output_dir):
         new_pdf = PdfReader(packet)
         
         # Ensure the template path is correct
-        template_path = "Quality Management Workshop/(Coordinator) Certificate Template - Quality Management Workshop.pdf"
+        template_path = "Quality Week Celebration\(Coordinator) Poster Presentation - World Quality Week Celebration.pdf"
         existing_pdf = PdfReader(open(template_path, "rb"))
         
         # Create a writer object
@@ -93,9 +93,9 @@ def read_excel_and_generate_certificates(file_path, base_output_dir):
     create_certificates(participants, number, output_dir)
 
 # Example usage
-excel_files = [r"Quality Management Workshop\Coordinator List - Quality Management Workshop.xlsx"]
+excel_files = [r"Quality Week Celebration\Test.xlsx"]
 
-base_output_dir = r"Quality Management Workshop\Processed Certificates"
+base_output_dir = r"Quality Week Celebration\Processed Certificates"
 
 for file in excel_files:
     read_excel_and_generate_certificates(file, base_output_dir)
