@@ -88,7 +88,7 @@ def read_excel_and_generate_certificates(file_path, base_output_dir):
     create_certificates(participants, number, output_dir)
 
 # Example usage
-excel_files = [r"Quality Week Celebration\Test.xlsx"]
+excel_files = [r"Quality Week Celebration\ASQ_ Poster Coordinator List - World Quality Week Celebration.xlsx"]
 
 base_output_dir = r"Quality Week Celebration\Processed Certificates"
 
