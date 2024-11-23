@@ -7,7 +7,7 @@ from email import encoders
 import os
 from concurrent.futures import ThreadPoolExecutor
 
-def send_email(to_email, cc_email, subject, body, attachment_paths):
+def send_email(to_email, bcc_email, subject, body, attachment_paths):
     from_email = "harshwardhan22csu392@ncuindia.edu"  # Replace with your email
     from_password = "dhqz hgpc taqo ijps"  # Replace with your app-specific password
 
@@ -17,9 +17,8 @@ def send_email(to_email, cc_email, subject, body, attachment_paths):
     msg['To'] = to_email
     msg['Subject'] = subject
 
-    if cc_email:
-        msg['Cc'] = cc_email  # Add CC if provided
-        to_email = [to_email] + [cc_email]  # Include CC in the recipient list
+    if bcc_email:
+        to_email = [to_email] + [bcc_email]  # Include BCC in the recipient list
 
     # Attach the body with the msg instance
     msg.attach(MIMEText(body, 'plain'))
@@ -58,7 +57,7 @@ def read_excel_and_send_certificates(file_path, base_output_dir):
     name_column = input("Enter the column name for the participant's name: ")
     roll_no_column = input("Enter the column name for the participant's roll number: ")
     email_column = input("Enter the column name for the participant's email: ")
-    cc_email = input("Enter the CC email address (or leave blank if none): ")
+    bcc_email = input("Enter the BCC email address (or leave blank if none): ")
     subject = input("Enter the subject line for the email: ")
 
     participants = df.apply(lambda row: f"{row[name_column]} {row[roll_no_column]}", axis=1).tolist()
@@ -85,7 +84,7 @@ def read_excel_and_send_certificates(file_path, base_output_dir):
             certificate_paths = find_certificates(base_output_dir, participants[index])
             if certificate_paths:
                 # Each email is sent to its own recipient
-                executor.submit(send_email, email, cc_email, subject, personalized_thank_you_note, certificate_paths)
+                executor.submit(send_email, email, bcc_email, subject, personalized_thank_you_note, certificate_paths)
             else:
                 print(f"Certificates for {participants[index]} not found.")
 

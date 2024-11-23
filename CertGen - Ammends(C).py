@@ -6,10 +6,6 @@ import io
 import os
 
 def create_certificates(participants, number, output_dir):
-    # Check if the output directory exists, if not, create it
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    
     for participant in participants:
         name = participant
         
@@ -38,35 +34,42 @@ def create_certificates(participants, number, output_dir):
         can.setFont(font, font_size_number)
         
         # Set coordinates for the participant's number
-        x_number = 530  # X-coordinate for the number
-        y_number = 190  # Y-coordinate for the number
+        x_number = 593  # X-coordinate for the number
+        y_number = 185  # Y-coordinate for the number
         
         # Draw the participant's number at the specified coordinates
-        can.drawString(x_number, y_number, str(number))
+        can.drawString(x_number, y_number, number)
         
-        # Save the canvas content to the packet
         can.save()
-        
-        # Move to the beginning of the StringIO buffer
+
+        # Move the pointer to the beginning of the StringIO buffer
         packet.seek(0)
-        
-        # Read the existing PDF template
-        existing_pdf = PdfReader(open(r"Quality Management Workshop\(Coordinator) Certificate Template - Quality Management Workshop.pdf", "rb"))
-        output = PdfWriter()
-        
-        # Add the "watermark" (which is the new pdf) on the existing page
+
+        # Read the new PDF with the name and number
         new_pdf = PdfReader(packet)
-        page = existing_pdf.pages[0]
-        page.merge_page(new_pdf.pages[0])
-        output.add_page(page)
         
-        # Finally, write "output" to a real file
-        output_filename = os.path.join(output_dir, f"{name}.pdf")
-        with open(output_filename, "wb") as outputStream:
+        # Ensure the template path is correct
+        template_path = "Quality Week Celebration\(Coordinator) Poster Presentation - World Quality Week Celebration.pdf"
+        existing_pdf = PdfReader(open(template_path, "rb"))
+        
+        # Create a writer object
+        output = PdfWriter()
+
+        # Merge the name and number PDF with the existing template
+        for i in range(len(existing_pdf.pages)):
+            page = existing_pdf.pages[i]
+            if i == 0:  # Assuming you want to modify the first page
+                page.merge_page(new_pdf.pages[0])
+            output.add_page(page)
+
+        # Save the final PDF to a file
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, f"{name}.pdf")
+        with open(output_path, "wb") as outputStream:
             output.write(outputStream)
-        
+
         # Print the absolute path of the saved PDF
-        absolute_path = os.path.abspath(output_filename)
+        absolute_path = os.path.abspath(output_path)
         print(f"Certificate saved as {absolute_path}")
 
 def read_excel_and_generate_certificates(file_path, base_output_dir):
@@ -75,8 +78,7 @@ def read_excel_and_generate_certificates(file_path, base_output_dir):
     
     folder_name = input(f"Enter the folder name to create inside the defined path for {file_path}: ")
     output_dir = os.path.join(base_output_dir, folder_name)
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    os.makedirs(output_dir, exist_ok=True)
     
     name_column = input("Enter the column name for the participant's name: ")
     roll_no_column = input("Enter the column name for the participant's roll number: ")
@@ -86,9 +88,9 @@ def read_excel_and_generate_certificates(file_path, base_output_dir):
     create_certificates(participants, number, output_dir)
 
 # Example usage
-excel_files = [r"Quality Management Workshop\Ammendments - List(C).xlsx"]
+excel_files = [r"Quality Week Celebration\Test.xlsx"]
 
-base_output_dir = r"Quality Management Workshop\Processed Certificates"
+base_output_dir = r"Quality Week Celebration\Processed Certificates"
 
 for file in excel_files:
     read_excel_and_generate_certificates(file, base_output_dir)
