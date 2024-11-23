@@ -7,9 +7,9 @@ from email import encoders
 import os
 from concurrent.futures import ThreadPoolExecutor
 
-def send_email(to_email, cc_email, subject, body, attachment_path):
+def send_email(to_email, cc_email, subject, body, attachment_paths):
     from_email = "harshwardhan22csu392@ncuindia.edu"  # Replace with your email
-    from_password = "umrp qgqg rdyh qscq"  # Replace with your app-specific password
+    from_password = "dhqz hgpc taqo ijps"  # Replace with your app-specific password
 
     # Create the email message
     msg = MIMEMultipart()
@@ -24,8 +24,8 @@ def send_email(to_email, cc_email, subject, body, attachment_path):
     # Attach the body with the msg instance
     msg.attach(MIMEText(body, 'plain'))
 
-    # Attach the certificate
-    if attachment_path:
+    # Attach the certificates
+    for attachment_path in attachment_paths:
         with open(attachment_path, "rb") as attachment:
             part = MIMEBase("application", "octet-stream")
             part.set_payload(attachment.read())
@@ -43,12 +43,13 @@ def send_email(to_email, cc_email, subject, body, attachment_path):
     except Exception as e:
         print(f"Failed to send email to {to_email}: {e}")
 
-def find_certificate(base_output_dir, participant):
+def find_certificates(base_output_dir, participant):
+    certificates = []
     for root, dirs, files in os.walk(base_output_dir):
         for file in files:
-            if file == f"{participant}.pdf":
-                return os.path.join(root, file)
-    return None
+            if participant in file and file.endswith(".pdf"):
+                certificates.append(os.path.join(root, file))
+    return certificates
 
 def read_excel_and_send_certificates(file_path, base_output_dir):
     df = pd.read_excel(file_path)
@@ -66,10 +67,10 @@ def read_excel_and_send_certificates(file_path, base_output_dir):
     # Thank you note (original)
     thank_you_note = (
         "Dear [Participant's Name],\n\n"
-        "We would like to extend our heartfelt gratitude for your participation in the Quality Management Workshop organized by the ASQ Student Chapter. "
-        "Your engagement and enthusiasm contributed significantly to the success of the event.\n\n"
-        "We hope that the insights shared during the workshop, particularly on Lean Manufacturing and Quality Management Systems, will empower you to enhance quality and efficiency in your respective fields.\n\n"
-        "Thank you once again for being a part of this enriching experience. We look forward to seeing you at future events!\n\n"
+        "We would like to extend our heartfelt gratitude for your participation in the World Quality Week Celebration held on 11th and 12th November.\n\n"
+        "Your enthusiasm and engagement in the Poster Making and Movie Screening events added immense value to the celebration. It is through contributions like yours that events like these become truly memorable and impactful.\n\n"
+        "Please find your certificate of participation attached as a token of our appreciation.\n\n"
+        "Thank you once again for being a part of this enriching experience. We look forward to seeing you at our future events!\n\n"
         "Warm regards,\n"
         "ASQ Student Chapter Team\n"
     )
@@ -81,19 +82,15 @@ def read_excel_and_send_certificates(file_path, base_output_dir):
             # Replace placeholder with actual participant name
             personalized_thank_you_note = thank_you_note.replace("[Participant's Name]", participant_name)
             
-            certificate_path = find_certificate(base_output_dir, participants[index])
-            if certificate_path:
+            certificate_paths = find_certificates(base_output_dir, participants[index])
+            if certificate_paths:
                 # Each email is sent to its own recipient
-                executor.submit(send_email, email, cc_email, subject, personalized_thank_you_note, certificate_path)
+                executor.submit(send_email, email, cc_email, subject, personalized_thank_you_note, certificate_paths)
             else:
-                print(f"Certificate for {participants[index ]} not found.")
+                print(f"Certificates for {participants[index]} not found.")
 
 # Example usage
-excel_files = [
-    r"Quality Management Workshop\ASQ Member List - Quality Management Workshop.xlsx",
-    r"Quality Management Workshop\Coordinator List - Quality Management Workshop.xlsx",
-    r"Quality Management Workshop\Participant List - Quality Management Workshop.xlsx"
-]
+excel_files = [r"Quality Week Celebration\Test.xlsx"]
 
 # Prompt user to select which Excel sheet to start from
 print("Available Excel files:")
@@ -110,7 +107,7 @@ while True:
     except ValueError:
         print("Invalid input. Please enter a number.")
 
-base_output_dir = r"Quality Management Workshop\Processed Certificates"
+base_output_dir = r"Quality Week Celebration\Processed Certificates"
 
 # Process selected Excel sheet and any subsequent sheets
 for file in excel_files[start_index:]:

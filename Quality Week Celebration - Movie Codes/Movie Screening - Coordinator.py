@@ -5,13 +5,16 @@ from reportlab.lib.pagesizes import letter
 import io
 import os
 
+# Define a custom page size (width, height)
+custom_page_size = (800, 792)  # Adjust the width as needed
+
 def create_certificates(participants, number, output_dir):
     for participant in participants:
         name = participant
         
-        # Create a PDF canvas in memory
+        # Create a PDF canvas in memory with the custom page size
         packet = io.BytesIO()
-        can = canvas.Canvas(packet, pagesize=letter)
+        can = canvas.Canvas(packet, pagesize=custom_page_size)
         
         # Set font style, size, and make it bold for the name
         font = "Helvetica-Bold"
@@ -22,8 +25,8 @@ def create_certificates(participants, number, output_dir):
         name_width = can.stringWidth(name, font, font_size_name)
         
         # Set coordinates for the participant's name
-        page_width, page_height = letter
-        x_name = (page_width - name_width + 233) / 2  # Center the name horizontally
+        page_width, page_height = custom_page_size
+        x_name = (page_width - name_width + 70) / 2  # Center the name horizontally
         y_name = 226  # Y-coordinate for the name
         
         # Draw the participant's name at the specified coordinates
@@ -34,8 +37,8 @@ def create_certificates(participants, number, output_dir):
         can.setFont(font, font_size_number)
         
         # Set coordinates for the participant's number
-        x_number = 593  # X-coordinate for the number
-        y_number = 185  # Y-coordinate for the number
+        x_number = 660  # Adjusted X-coordinate for the number
+        y_number = 186  # Y-coordinate for the number
         
         # Draw the participant's number at the specified coordinates
         can.drawString(x_number, y_number, number)
